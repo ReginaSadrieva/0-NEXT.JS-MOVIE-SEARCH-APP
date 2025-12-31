@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google'; // Font example.
-import 'antd/dist/reset.css'; // AntD CSS reset.
+import { Inter } from 'next/font/google';
+import 'antd/dist/reset.css';
+import './globals.css';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -17,12 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={inter.className}
-        style={{
-          margin: 0,
-          backgroundColor: '#f5f5f5', // Light gray background as common in Figma designs
-          minHeight: '100vh',
-        }}
+        className={`${inter.className} m-0 bg-gray-100 min-h-screen`} // Tailwind: m-0 (margin:0), bg-gray-100 (#f5f5f5), min-h-screen
       >
         {children}
       </body>

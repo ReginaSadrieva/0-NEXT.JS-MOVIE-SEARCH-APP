@@ -25,97 +25,48 @@ export default function MovieCard({ movie }: MovieCardProps) {
     <Card
       hoverable
       styles={{ body: { padding: 0 } }}
+      className="w-full rounded-none bg-white"
       style={{
-        width: '100%',
         borderRadius: 0,
-        overflow: 'hidden',
-        backgroundColor: '#ffffff',
         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'row', gap: 20 }}>
-        {/* Poster - with no margins */}
-        <div style={{ flexShrink: 0 }}>
+      {/* layout — tailwind, without replacing antd */}
+      <div className="flex flex-row gap-[20px]">
+        {/* Poster */}
+        <div className="shrink-0">
           {posterUrl ? (
             <Image
               src={posterUrl}
               alt={movie.title}
               width={183}
               height={281}
-              style={{
-                width: 183,
-                height: 281,
-                objectFit: 'cover',
-                display: 'block',
-                margin: 0,
-                padding: 0,
-              }}
-              priority={false}
+              className="block h-[281px] w-[183px] object-cover"
             />
           ) : (
-            <div
-              style={{
-                width: 183,
-                height: 281,
-                backgroundColor: '#f0f0f0',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: 0,
-                padding: 0,
-              }}
-            >
+            <div className="flex h-[281px] w-[183px] items-center justify-center bg-[#f0f0f0]">
               No Poster
             </div>
           )}
         </div>
 
-        {/* Right part - with normal margins */}
-        <div
-          style={{
-            flex: 1,
-            padding: '16px 16px 16px 20px',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 7,
-          }}
-        >
-          <Title level={5} style={{ margin: 0, color: '#000000' }}>
+        {/* Content */}
+        <div className="flex flex-1 flex-col gap-[7px] px-[16px] py-[16px] pl-[20px]">
+          {/* Title —  Typography */}
+          <Title level={5} className="!m-0 !text-black">
             {movie.title}
           </Title>
 
-          <Text style={{ fontSize: 12, color: '#827e7e' }}>{releaseDate}</Text>
+          {/* Date —  Typography */}
+          <Text className="!text-[12px] !text-[#827e7e]">{releaseDate}</Text>
 
-          <Space size={[0, 8]} wrap>
-            <Tag
-              style={{
-                backgroundColor: '#fafafa',
-                border: '1px solid #d9d9d9',
-                borderRadius: 2,
-                color: 'rgba(0, 0, 0, 0.65)',
-                fontSize: 12,
-                padding: '0 7px',
-                marginRight: 8,
-              }}
-            >
-              Action
-            </Tag>
-            <Tag
-              style={{
-                backgroundColor: '#fafafa',
-                border: '1px solid #d9d9d9',
-                borderRadius: 2,
-                color: 'rgba(0, 0, 0, 0.65)',
-                fontSize: 12,
-                padding: '0 7px',
-                marginRight: 8,
-              }}
-            >
-              Drama
-            </Tag>
+          {/* Tags */}
+          <Space wrap>
+            <Tag style={{ marginRight: 8 }}>Action</Tag>
+            <Tag style={{ marginRight: 8 }}>Drama</Tag>
           </Space>
-
-          <Text style={{ marginTop: 7, fontSize: 12, lineHeight: 1.5, color: '#000000' }}>
+          {/* Description — Typography */}
+          <Text className="!mt-[7px] !text-[12px] !leading-[1.5] !text-black">
             {truncateDescription(movie.overview || '', 350)}
           </Text>
         </div>

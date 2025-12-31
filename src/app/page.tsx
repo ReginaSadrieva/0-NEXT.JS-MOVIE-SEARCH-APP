@@ -1,19 +1,35 @@
-import { Movie } from '@/types/movie'; // Type for movies.
-import MovieList from '@/components/MovieList'; // Client UI component.
+'use client'; // Make this a Client Component
 
-// Async Server Component: Fetches data on server-side.
-export default async function Home() {
-  // Fetch movies from TMDB API using keyword 'return' (as per task; probably search term).
-  const response = await fetch(
-    `https://api.themoviedb.org/3/search/movie?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&query=return`,
-    { cache: 'force-cache' }, // Next.js caching for static data.
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch movies');
+import { useEffect, useState } from 'react';
+import { Movie } from '@/types/movie';
+import MovieList from '@/components/MovieList';
+
+export default function Home() {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const response = await fetch('/api/movies'); // Fetch from internal API route
+
+        if (!response.ok) {
+          throw new Error('Failed to load movies');
+        }
+
+        const data = await response.json();
+        setMovies(data.movies || []);
+      } catch {
+        setError('Unable to load movies. Please try again later.');
+      }
+    };
+
+    fetchMovies();
+  }, []);
+
+  if (error) {
+    return <div>{error}</div>; // Fallback UI without crashing the page
   }
-  const data = await response.json();
-  const movies: Movie[] = data.results || [];
 
-  // Pass data to Client Component for rendering.
   return <MovieList movies={movies} />;
 }
