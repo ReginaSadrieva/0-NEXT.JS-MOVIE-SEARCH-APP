@@ -28,7 +28,7 @@ export default function Home() {
         } else {
           setMovies(data.movies || []);
         }
-      } catch (err) {
+      } catch {
         setError('Unable to load movies. Please try again later.');
       } finally {
         setLoading(false);
