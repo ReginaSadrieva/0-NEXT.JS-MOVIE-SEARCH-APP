@@ -14,11 +14,31 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const pageSize = 10;
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
 
   useEffect(() => {
     const debouncedFetch = debounce(async (query: string, page: number) => {
       setLoading(true);
       setError(null);
+
+      if (!isOnline) {
+        setError('No internet connection. Please check your network.');
+        setLoading(false);
+        return;
+      }
 
       try {
         const url = `/api/movies?query=${encodeURIComponent(query || 'return')}&page=${page}&pageSize=${pageSize}`;
@@ -50,7 +70,7 @@ export default function Home() {
     return () => {
       debouncedFetch.cancel();
     };
-  }, [searchQuery, currentPage]);
+  }, [searchQuery, currentPage, isOnline]);
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
