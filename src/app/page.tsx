@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { Spin, Alert } from 'antd';
+import { debounce } from 'lodash';
 import { Movie } from '@/types/movie';
 import MovieList from '@/components/MovieList';
 
@@ -9,34 +10,19 @@ export default function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalResults, setTotalResults] = useState(0);
+  const pageSize = 10;
 
   useEffect(() => {
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
-    };
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!isOnline) {
-        setError('No internet connection. Please check your network.');
-        setLoading(false);
-        return;
-      }
-
+    const debouncedFetch = debounce(async (query: string, page: number) => {
       setLoading(true);
       setError(null);
 
       try {
-        const response = await fetch('/api/movies');
+        const url = `/api/movies?query=${encodeURIComponent(query || 'return')}&page=${page}&pageSize=${pageSize}`;
+        const response = await fetch(url);
 
         if (!response.ok) {
           throw new Error('Failed to load movies');
@@ -48,27 +34,43 @@ export default function Home() {
           setError(data.error);
         } else {
           setMovies(data.movies || []);
+          setTotalResults(data.total || 0);
+          setCurrentPage(data.page || 1);
         }
       } catch {
         setError('Unable to load movies. Please try again later.');
       } finally {
         setLoading(false);
       }
+    }, 500);
+
+    debouncedFetch(searchQuery, currentPage);
+
+    // Cleanup debounce on unmount or deps change
+    return () => {
+      debouncedFetch.cancel();
     };
+  }, [searchQuery, currentPage]);
 
-    fetchData();
-  }, [isOnline]); // Dependency on isOnline -  refetch when online status change
+  const handleSearch = (value: string) => {
+    setSearchQuery(value);
+    setCurrentPage(1);
+  };
 
-  // Loading state
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[80vh]">
-        <Spin size="large" tip="Loading movies..." />
+        <Spin size="large" tip="Loading movies...">
+          <div className="min-h-[100px]" />
+        </Spin>
       </div>
     );
   }
 
-  // Error state (including offline)
   if (error) {
     return (
       <div className="max-w-2xl mx-auto p-6">
@@ -77,6 +79,29 @@ export default function Home() {
     );
   }
 
-  // Success state
-  return <MovieList movies={movies} />;
+  if (movies.length === 0 && !loading && !error) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 text-center">
+        <Alert
+          title="No Results"
+          description={`No movies found for "${searchQuery || 'return'}"`}
+          type="info"
+          showIcon
+          className="mb-6"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <MovieList
+      movies={movies}
+      totalResults={totalResults}
+      currentPage={currentPage}
+      pageSize={pageSize}
+      searchQuery={searchQuery}
+      onSearch={handleSearch}
+      onPageChange={handlePageChange}
+    />
+  );
 }
