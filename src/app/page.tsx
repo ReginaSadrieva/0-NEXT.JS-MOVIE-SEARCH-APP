@@ -5,6 +5,7 @@ import { Spin, Alert } from 'antd';
 import { debounce } from 'lodash';
 import { Movie } from '@/types/movie';
 import MovieList from '@/components/MovieList';
+import { useAppContext } from '@/context/AppContext';
 
 export default function Home() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -14,7 +15,9 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
   const pageSize = 10;
+  const [tabKey, setTabKey] = useState('search');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const { guestSessionId } = useAppContext();
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -41,7 +44,13 @@ export default function Home() {
       }
 
       try {
-        const url = `/api/movies?query=${encodeURIComponent(query || 'return')}&page=${page}&pageSize=${pageSize}`;
+        let url;
+        if (tabKey === 'rated') {
+          url = `/api/rated?guest_session_id=${guestSessionId}&page=${page}&pageSize=${pageSize}`;
+        } else {
+          url = `/api/movies?query=${encodeURIComponent(query || 'return')}&page=${page}&pageSize=${pageSize}`;
+        }
+
         const response = await fetch(url);
 
         if (!response.ok) {
@@ -70,7 +79,7 @@ export default function Home() {
     return () => {
       debouncedFetch.cancel();
     };
-  }, [searchQuery, currentPage, isOnline]);
+  }, [searchQuery, currentPage, isOnline, tabKey, guestSessionId]);
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);
@@ -79,6 +88,12 @@ export default function Home() {
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
+  };
+
+  const handleTabChange = (key: string) => {
+    setTabKey(key);
+    setCurrentPage(1);
+    setSearchQuery(''); // Reset search for Rated tab
   };
 
   if (loading) {
@@ -122,6 +137,8 @@ export default function Home() {
       searchQuery={searchQuery}
       onSearch={handleSearch}
       onPageChange={handlePageChange}
+      onTabChange={handleTabChange}
+      activeKey={tabKey}
     />
   );
 }

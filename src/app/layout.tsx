@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import 'antd/dist/reset.css';
 import './globals.css';
+import { AppProvider } from '@/context/AppContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -20,7 +21,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} m-0 bg-gray-100 min-h-screen`} // Tailwind: m-0 (margin:0), bg-gray-100 (#f5f5f5), min-h-screen
       >
-        {children}
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );

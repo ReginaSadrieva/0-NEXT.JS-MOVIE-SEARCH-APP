@@ -12,6 +12,8 @@ interface MovieListProps {
   searchQuery: string;
   onSearch: (value: string) => void;
   onPageChange: (page: number) => void;
+  onTabChange: (key: string) => void;
+  activeKey: string;
 }
 
 export default function MovieList({
@@ -22,14 +24,17 @@ export default function MovieList({
   searchQuery,
   onSearch,
   onPageChange,
+  onTabChange,
+  activeKey,
 }: MovieListProps) {
   return (
     <div className="bg-white p-10 md:px-[39px] mx-auto max-w-[1200px] rounded-lg w-full box-border">
       <Tabs
-        activeKey="search"
+        activeKey={activeKey}
         centered
         tabBarStyle={{ borderBottom: 'none', marginBottom: '19px' }}
         className="mb-0"
+        onChange={(key) => onTabChange(key)}
         items={[
           {
             key: 'search',
@@ -79,7 +84,6 @@ export default function MovieList({
           {
             key: 'rated',
             label: 'Rated',
-            disabled: true,
           },
         ]}
       />
