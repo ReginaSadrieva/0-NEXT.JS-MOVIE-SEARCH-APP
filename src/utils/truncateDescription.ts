@@ -1,6 +1,6 @@
 // Utility function to truncate movie description without cutting off words.
 // Takes the full text and max length, appends '...' if truncated.
-export function truncateDescription(text: string, maxLength: number = 350): string {
+export function truncateDescription(text: string, maxLength: number = 200): string {
   if (text.length <= maxLength) {
     return text;
   }

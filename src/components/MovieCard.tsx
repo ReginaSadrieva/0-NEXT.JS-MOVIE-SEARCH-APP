@@ -77,7 +77,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
           </div>
 
           {/* Title —  Typography */}
-          <Title level={5} className="!m-0 !text-black">
+          <Title level={5} className="max-w-[200px] !m-0 !text-black">
             {movie.title}
           </Title>
 
@@ -101,7 +101,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
           {/* Description — Typography */}
           <Text className="!mt-[7px] !text-[12px] !leading-[1.5] !text-black">
-            {truncateDescription(movie.overview || '', 350)}
+            {truncateDescription(movie.overview || '', 200)}
           </Text>
           {/* Star ratings — under description */}
           <Rate

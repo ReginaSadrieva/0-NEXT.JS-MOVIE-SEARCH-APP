@@ -38,11 +38,7 @@ export default function MovieList({
         items={[
           {
             key: 'search',
-            label: (
-              <span className="text-blue-600 font-medium text-lg pb-[11px] border-b-2 border-blue-600">
-                Search
-              </span>
-            ),
+            label: <span className="font-medium pb-[11px]">Search</span>,
             children: (
               <>
                 {/* Search field */}
@@ -84,6 +80,31 @@ export default function MovieList({
           {
             key: 'rated',
             label: 'Rated',
+            children: (
+              <>
+                {/* Movies */}
+                <Row gutter={[36, 36]} justify="center" className="mt-8">
+                  {movies.map((movie) => (
+                    <Col key={movie.id} xs={24} md={12} className="flex items-start">
+                      <MovieCard movie={movie} />
+                    </Col>
+                  ))}
+                </Row>
+
+                {/* Pagination */}
+                {totalResults > pageSize && (
+                  <div className="mt-8 flex justify-center">
+                    <Pagination
+                      current={currentPage}
+                      pageSize={pageSize}
+                      total={totalResults}
+                      onChange={onPageChange}
+                      showSizeChanger={false}
+                    />
+                  </div>
+                )}
+              </>
+            ),
           },
         ]}
       />
