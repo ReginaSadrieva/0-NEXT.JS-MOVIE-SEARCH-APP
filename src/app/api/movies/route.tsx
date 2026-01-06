@@ -19,7 +19,8 @@ export async function GET(request: Request) {
 
     const data = await response.json();
     const movies: Movie[] = data.results || [];
-    const total = data.total_results || 0;
+    const totalPages = Math.min(data.total_pages || 0, 500);
+    const total = totalPages * pageSize;
 
     return NextResponse.json({
       movies,

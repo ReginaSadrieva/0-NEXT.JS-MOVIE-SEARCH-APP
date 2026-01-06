@@ -5,8 +5,9 @@ export async function GET(request: Request) {
   const guestSessionId = searchParams.get('guest_session_id');
   const page = parseInt(searchParams.get('page') || '1');
 
-  if (!guestSessionId)
+  if (!guestSessionId) {
     return NextResponse.json({ error: 'Guest session required' }, { status: 400 });
+  }
 
   try {
     const res = await fetch(
@@ -17,9 +18,13 @@ export async function GET(request: Request) {
     if (!res.ok) throw new Error('Failed to fetch rated movies');
 
     const data = await res.json();
+
+    const totalPages = data.total_pages || 0;
+    const total = totalPages * 10;
+
     return NextResponse.json({
       movies: data.results || [],
-      total: data.total_results || 0,
+      total,
       page: data.page || 1,
     });
   } catch {
