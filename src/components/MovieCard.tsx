@@ -32,7 +32,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
   const rating = movie.vote_average || 0;
   const ratingColor =
     rating <= 3 ? '#E90000' : rating <= 5 ? '#E97E00' : rating <= 7 ? '#E9D100' : '#66E900';
-  const userRating = typeof movie.user_rating === 'number' ? movie.user_rating / 2 : 0;
+  const userRating =
+    'rating' in movie && typeof movie.rating === 'number' ? movie.rating : undefined;
 
   return (
     <Card
