@@ -16,7 +16,12 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [genres, setGenres] = useState<Genre[]>([]);
-  const [guestSessionId, setGuestSessionId] = useState<string | null>(null);
+  const [guestSessionId, setGuestSessionId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('guestSessionId');
+    }
+    return null;
+  });
 
   useEffect(() => {
     // Fetch genres on app start
@@ -35,14 +40,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
       try {
         const res = await fetch('/api/guest-session');
         const data = await res.json();
-        if (data.guest_session_id) setGuestSessionId(data.guest_session_id);
+
+        if (data.guest_session_id) {
+          setGuestSessionId(data.guest_session_id);
+          localStorage.setItem('guestSessionId', data.guest_session_id);
+        }
       } catch (err) {
         console.error('Failed to create guest session:', err);
       }
     };
 
     fetchGenres();
-    createGuestSession();
+    if (!guestSessionId) {
+      createGuestSession();
+    }
   }, []);
 
   return <AppContext.Provider value={{ genres, guestSessionId }}>{children}</AppContext.Provider>;

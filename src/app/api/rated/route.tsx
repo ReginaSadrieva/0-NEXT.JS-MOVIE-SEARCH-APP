@@ -11,7 +11,7 @@ export async function GET(request: Request) {
   try {
     const res = await fetch(
       `https://api.themoviedb.org/3/guest_session/${guestSessionId}/rated/movies?api_key=${process.env.NEXT_PUBLIC_TMDB_API_KEY}&page=${page}`,
-      { cache: 'force-cache' },
+      { cache: 'no-store' },
     );
 
     if (!res.ok) throw new Error('Failed to fetch rated movies');
