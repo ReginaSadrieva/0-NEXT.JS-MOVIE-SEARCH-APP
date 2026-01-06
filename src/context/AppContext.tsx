@@ -1,4 +1,3 @@
-// Context for genres and guest session ID
 'use client';
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
@@ -7,9 +6,15 @@ interface Genre {
   name: string;
 }
 
+interface RatingsMap {
+  [movieId: number]: number;
+}
+
 interface AppContextType {
   genres: Genre[];
   guestSessionId: string | null;
+  ratingsMap: RatingsMap;
+  setRating: (movieId: number, rating: number) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -23,40 +28,49 @@ export function AppProvider({ children }: { children: ReactNode }) {
     return null;
   });
 
+  const [ratingsMap, setRatingsMap] = useState<Record<number, number>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('ratingsMap');
+      return saved ? JSON.parse(saved) : {};
+    }
+    return {};
+  });
+
+  const setRating = (movieId: number, rating: number) => {
+    setRatingsMap((prev) => {
+      const next = { ...prev, [movieId]: rating };
+      localStorage.setItem('ratingsMap', JSON.stringify(next));
+      return next;
+    });
+  };
+
   useEffect(() => {
-    // Fetch genres on app start
     const fetchGenres = async () => {
-      try {
-        const res = await fetch('/api/genres');
-        const data = await res.json();
-        if (data.genres) setGenres(data.genres);
-      } catch (err) {
-        console.error('Failed to fetch genres:', err);
-      }
+      const res = await fetch('/api/genres');
+      const data = await res.json();
+      if (data.genres) setGenres(data.genres);
     };
 
-    // Create guest session on app start
     const createGuestSession = async () => {
-      try {
-        const res = await fetch('/api/guest-session');
-        const data = await res.json();
+      if (guestSessionId) return;
 
-        if (data.guest_session_id) {
-          setGuestSessionId(data.guest_session_id);
-          localStorage.setItem('guestSessionId', data.guest_session_id);
-        }
-      } catch (err) {
-        console.error('Failed to create guest session:', err);
+      const res = await fetch('/api/guest-session');
+      const data = await res.json();
+      if (data.guest_session_id) {
+        setGuestSessionId(data.guest_session_id);
+        localStorage.setItem('guestSessionId', data.guest_session_id);
       }
     };
 
     fetchGenres();
-    if (!guestSessionId) {
-      createGuestSession();
-    }
-  }, []);
+    createGuestSession();
+  }, [guestSessionId]);
 
-  return <AppContext.Provider value={{ genres, guestSessionId }}>{children}</AppContext.Provider>;
+  return (
+    <AppContext.Provider value={{ genres, guestSessionId, ratingsMap, setRating }}>
+      {children}
+    </AppContext.Provider>
+  );
 }
 
 export function useAppContext() {
