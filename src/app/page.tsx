@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Spin, Alert } from 'antd';
+//import { Spin, Alert } from 'antd';
 import { debounce } from 'lodash';
 import { Movie } from '@/types/movie';
 import MovieList from '@/components/MovieList';
@@ -96,37 +96,37 @@ export default function Home() {
     setSearchQuery(''); // Reset search for Rated tab
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[80vh]">
-        <Spin size="large" tip="Loading movies...">
-          <div className="min-h-[100px]" />
-        </Spin>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="flex justify-center items-center min-h-[80vh]">
+  //       <Spin size="large" tip="Loading movies...">
+  //         <div className="min-h-[100px]" />
+  //       </Spin>
+  //     </div>
+  //   );
+  // }
 
-  if (error) {
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Alert message="Error" description={error} type="error" showIcon className="mb-6" />
-      </div>
-    );
-  }
+  // if (error) {
+  //   return (
+  //     <div className="max-w-2xl mx-auto p-6">
+  //       <Alert message="Error" description={error} type="error" showIcon className="mb-6" />
+  //     </div>
+  //   );
+  // }
 
-  if (movies.length === 0 && !loading && !error) {
-    return (
-      <div className="max-w-2xl mx-auto p-6 text-center">
-        <Alert
-          title="No Results"
-          description={`No movies found for "${searchQuery || 'return'}"`}
-          type="info"
-          showIcon
-          className="mb-6"
-        />
-      </div>
-    );
-  }
+  // if (movies.length === 0 && !loading && !error) {
+  //   return (
+  //     <div className="max-w-2xl mx-auto p-6 text-center">
+  //       <Alert
+  //         title="No Results"
+  //         description={`No movies found for "${searchQuery || 'return'}"`}
+  //         type="info"
+  //         showIcon
+  //         className="mb-6"
+  //       />
+  //     </div>
+  //   );
+  // }
 
   return (
     <MovieList
@@ -135,6 +135,8 @@ export default function Home() {
       currentPage={currentPage}
       pageSize={pageSize}
       searchQuery={searchQuery}
+      loading={loading}
+      error={error}
       onSearch={handleSearch}
       onPageChange={handlePageChange}
       onTabChange={handleTabChange}
