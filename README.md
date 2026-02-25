@@ -5,7 +5,9 @@
 ## ᛗ Author
 
 Ing. Regina Sadrieva
+
 Certified Front-End Developer | Certified Scrum Master II | Senior IT Analyst
+
 I write code the way witches cast circles: precisely, deliberately, and never twice the same.
 
 ## ᛞ Description
